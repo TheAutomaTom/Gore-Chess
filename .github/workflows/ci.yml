@@ -10,7 +10,7 @@ on:
       - '.github/**'
       - '!.github/workflows/ci.yml'
       - '!.github/workflows/typechecking.yml'
-      - '!.github/workflows/tests.yml'
+      # - '!.github/workflows/tests.yml'
       - '!.github/workflows/release.yml'
       - '**.md'
       - .editorconfig
@@ -22,7 +22,7 @@ on:
       - '.github/**'
       - '!.github/workflows/ci.yml'
       - '!.github/workflows/typechecking.yml'
-      - '!.github/workflows/tests.yml'
+      # - '!.github/workflows/tests.yml'
       - '!.github/workflows/release.yml'
       - '**.md'
       - .editorconfig
