@@ -36,13 +36,13 @@
     /**
      * This will make the history of changes in the hit a little cleaner
      */
-    "comma-dangle": ["warn", "always-multiline"],
+    "comma-dangle": ["warn", "never"],
     /**
      * Just for beauty
      */
     "quotes": [
       "warn",
-      "single",
+      "double",
       {
         "avoidEscape": true
       }

@@ -1,12 +1,12 @@
-import type {Session} from 'electron';
-import {app, shell} from 'electron';
-import {URL} from 'node:url';
+import type {Session} from "electron";
+import {app, shell} from "electron";
+import {URL} from "node:url";
 
 /**
  * Union for all existing permissions in electron
  */
 type Permission = Parameters<
-  Exclude<Parameters<Session['setPermissionRequestHandler']>[0], null>
+  Exclude<Parameters<Session["setPermissionRequestHandler"]>[0], null>
 >[1];
 
 /**
@@ -17,7 +17,7 @@ type Permission = Parameters<
 const ALLOWED_ORIGINS_AND_PERMISSIONS = new Map<string, Set<Permission>>(
   import.meta.env.DEV && import.meta.env.VITE_DEV_SERVER_URL
     ? [[new URL(import.meta.env.VITE_DEV_SERVER_URL).origin, new Set()]]
-    : [],
+    : []
 );
 
 /**
@@ -30,9 +30,9 @@ const ALLOWED_ORIGINS_AND_PERMISSIONS = new Map<string, Set<Permission>>(
  *   href="https://github.com/"
  * >
  */
-const ALLOWED_EXTERNAL_ORIGINS = new Set<`https://${string}`>(['https://github.com']);
+const ALLOWED_EXTERNAL_ORIGINS = new Set<`https://${string}`>(["https://github.com"]);
 
-app.on('web-contents-created', (_, contents) => {
+app.on("web-contents-created", (_, contents) => {
   /**
    * Block navigation to origins not on the allowlist.
    *
@@ -41,7 +41,7 @@ app.on('web-contents-created', (_, contents) => {
    *
    * @see https://www.electronjs.org/docs/latest/tutorial/security#13-disable-or-limit-navigation
    */
-  contents.on('will-navigate', (event, url) => {
+  contents.on("will-navigate", (event, url) => {
     const {origin} = new URL(url);
     if (ALLOWED_ORIGINS_AND_PERMISSIONS.has(origin)) {
       return;
@@ -93,7 +93,7 @@ app.on('web-contents-created', (_, contents) => {
     }
 
     // Prevent creating a new window.
-    return {action: 'deny'};
+    return {action: "deny"};
   });
 
   /**
@@ -103,7 +103,7 @@ app.on('web-contents-created', (_, contents) => {
    *
    * @see https://www.electronjs.org/docs/latest/tutorial/security#12-verify-webview-options-before-creation
    */
-  contents.on('will-attach-webview', (event, webPreferences, params) => {
+  contents.on("will-attach-webview", (event, webPreferences, params) => {
     const {origin} = new URL(params.src);
     if (!ALLOWED_ORIGINS_AND_PERMISSIONS.has(origin)) {
       if (import.meta.env.DEV) {
