@@ -5,7 +5,7 @@
   <div class="gameboard">
     <template v-for="r in 8" :key="r">
       <template v-for="s in 8" :key="s">
-        <square :square="board.layout[r-1][s-1]" />
+        <square-and-piece :square="board.layout[r-1][s-1]" />
       </template>
     </template>
   </div>
@@ -13,7 +13,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useGameState } from "../../state/Game.state";
-import Square from "./Square.vue";
+import SquareAndPiece from "./SquareAndPiece.vue";
 const game$ = useGameState();
 const board = ref(game$.Gameboard);
 

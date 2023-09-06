@@ -1,8 +1,8 @@
-import { GameboardModel } from "../models/GameboardModel";
 import type { Square } from "../models/GameboardModel";
+import { GameboardModel, Coordinate } from "../models/GameboardModel";
+import { PieceColor } from "../models/PieceModel";
 import { defineStore } from "pinia";
 import { nextTick, reactive, ref } from "vue";
-import { PieceColor } from "../models/PieceModel";
 
 export const useGameState = defineStore("GameState", () => {
 
@@ -12,32 +12,28 @@ export const useGameState = defineStore("GameState", () => {
   const OriginSquare= ref({} as Square | undefined);
 
 
-  const HandleSelectSquare = (square: Square) => {
-    console.log("[HandleSelectSquare] ...");
+  const HandleSelectSquare = (target: Square) => {
     if(IsMyTurn.value == false || undefined){
-      console.warn("[HandleSelectSquare] It's not my turn.");
-      return;
+      return console.warn("[HandleSelectSquare] It's not my turn.");
     }
 
     if(IsMyTurn.value == true){
       console.log("[HandleSelectSquare] It's my turn...");
 
-      if(square.piece == undefined && OriginSquare.value == undefined){
-        console.warn("[HandleSelectSquare] Nothing to move here.");
-        return;
+      if(target.piece == undefined && OriginSquare.value == undefined){
+        return console.warn("[HandleSelectSquare] ...nothing to select.");
       }
 
-      if(square.piece && square.piece.color == MyColor.value){
-          console.warn("[HandleSelectSquare] ...picking up my piece.");
-          pickupPiece(square);
-          return;
+      if(target.piece && target.piece.color == MyColor.value){
+        console.warn("[HandleSelectSquare] ...picking up my piece.");
+        return pickupPiece(target);
       }
 
-      else {
-          console.log("[HandleSelectSquare] ...tryCaptureSquare...");
-          tryCaptureSquare(square);
-          return;
-        }
+      else if(OriginSquare.value?.coordinate != undefined){
+        console.log("...");
+        console.log(`[HandleSelectSquare] ...tryCaptureSquare (OriginSquare: ${OriginSquare.value.coordinate.file}${OriginSquare.value.coordinate.row})...`);
+        return tryCaptureSquare(target);
+      }
     }
 
 
@@ -45,10 +41,71 @@ export const useGameState = defineStore("GameState", () => {
 
 
   // Private Methods...
+  const tryCaptureSquare = (targetSquare: Square) => {
+
+
+    // ABORT If my piece is already there...
+    if(targetSquare.piece?.color == MyColor.value){
+      console.warn("[tryCaptureSquare] You already occupy this square.");
+      dropAllPieces();
+      return;
+    }
+
+
+
+    // ATTACK If there is a piece to capture...
+    if(targetSquare.piece && targetSquare.piece.color  != MyColor.value){
+      /* TODO: Validate movement */
+      const cloneOfOriginPiece = (JSON.parse(JSON.stringify(OriginSquare.value?.piece)));
+
+      Gameboard.layout.map((row)=>
+        row.map((iSquare) => {
+          if(iSquare == targetSquare){
+            console.log(`[tryCaptureSquare/ ATTACK] ...REPLACE ${iSquare.piece} with ${cloneOfOriginPiece}...`);
+            cloneOfOriginPiece.Coordinate = new Coordinate(iSquare.coordinate.file, iSquare.coordinate.row);
+            iSquare.piece = cloneOfOriginPiece;
+
+          } else if(iSquare.coordinate == OriginSquare.value?.coordinate){
+            console.log(`[tryCaptureSquare/ ATTACK] iSquare 2: ${iSquare.coordinate.file}${iSquare.coordinate.row}`);
+            iSquare.piece = OriginSquare.value = undefined;
+            console.log(`[tryCaptureSquare/ ATTACK] ...REMOVE piece at origin square: ${iSquare.piece}`);
+          }
+        })
+      );
+      nextTick();
+      console.warn("[tryCaptureSquare/ ATTACK] Captured piece.");
+      return;
+    }
+
+
+
+    // MOVE If no pieces are there...
+    if(targetSquare.piece == undefined){
+      const cloneOfOriginPiece = (JSON.parse(JSON.stringify(OriginSquare.value?.piece)));
+
+      Gameboard.layout.map((row)=>
+        row.map((iSquare) => {
+          if(iSquare == targetSquare){
+            console.log(`[tryCaptureSquare/ MOVE] ...REPLACE ${iSquare.piece} with ${cloneOfOriginPiece}...`);
+            cloneOfOriginPiece.Coordinate = new Coordinate(iSquare.coordinate.file, iSquare.coordinate.row);
+            iSquare.piece = cloneOfOriginPiece;
+
+          } else if(iSquare.coordinate == OriginSquare.value?.coordinate){
+            console.log(`[tryCaptureSquare/ MOVE] iSquare 2: ${iSquare.coordinate.file}${iSquare.coordinate.row}`);
+            iSquare.piece = OriginSquare.value = undefined;
+            console.log(`[tryCaptureSquare/ MOVE] ...REMOVE piece at origin square: ${iSquare.piece}`);
+          }
+        })
+      );
+      nextTick();
+      console.warn("[tryCaptureSquare/ ATTACK] Captured piece.");
+      return;
+    }
+  };
+
   const pickupPiece = (square: Square) => {
     dropAllPieces();
     OriginSquare.value = square;
-
   };
 
   const dropAllPieces = () => {
@@ -59,63 +116,9 @@ export const useGameState = defineStore("GameState", () => {
     );
   };
 
-  const tryCaptureSquare = (targetSquare: Square) => {
-
-    // If my piece is already there...
-    if(targetSquare.piece?.color == MyColor.value){
-      console.warn("[tryCaptureSquare] You already occupy this square.");
-      dropAllPieces();
-      return;
-    }
-
-    // If no pieces are there...
-    else if(targetSquare.piece == undefined){
-      console.log("[tryCaptureSquare] ...moving to Empty square...");
-
-      OriginSquare.value!.coordinate = targetSquare.coordinate;
-
-      Gameboard.layout.map((row)=>
-        row.map((square) => {
-          if(square == targetSquare){
-            square.piece = OriginSquare.value?.piece;
-            square.piece!.coordinate = square.coordinate;
-            console.log("[tryCaptureSquare] ...targetSquare modified...");
-            console.log(`[tryCaptureSquare] ...modified targetSquare: ${targetSquare.piece}`);
-            nextTick();
-          }
-          if(square.coordinate == OriginSquare.value?.coordinate){
-            square.piece = undefined;
-            console.log(`[tryCaptureSquare] ...modified origin square: ${square.piece}`);
-            nextTick();
-
-          }
-        })
-      );
-      OriginSquare.value = undefined;
-      console.warn("[tryCaptureSquare] OriginSquare.value = " + OriginSquare.value + " (expected to be undefined).");
-        nextTick();
-      return;
-    }
-
-    // If there is a piece to capture...
-    else if(targetSquare.piece.color  != MyColor.value){
-        console.warn("[tryCaptureSquare] Capturing piece.");
-          // TODO: Validate movement
-
-
-        OriginSquare.value!.coordinate = targetSquare.coordinate;
-        targetSquare.piece = OriginSquare.value!.piece;
-        OriginSquare.value = undefined;
-        return;
-
-    }
-
-
-  };
-
   return {
     Gameboard,
-    PiecePickedUp: OriginSquare,
+    OriginSquare,
     HandleSelectSquare
     // Prj$: Project$,
   };

@@ -6,12 +6,12 @@ export enum PieceColor {
 }
 
 export enum PieceName {
-  king,
-  queen,
-  bishop,
-  knight,
-  rook,
-  pawn
+  king    ="King",
+  queen   ="Queen",
+  bishop  ="Bishop",
+  knight  ="Knight",
+  rook    ="Rook",
+  pawn    ="Pawn"
 }
 
 export enum Icon {

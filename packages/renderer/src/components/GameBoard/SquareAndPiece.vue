@@ -2,20 +2,21 @@
 <template>
   <div
     class="square"
-    :class="`${square?.color}`"
+    :class="`${square!.color}`"
     @click="handleClick"
   >
-    <piece
-      :piece="square?.piece"
-    />
+    <span
+      :class="`${square!.piece?.color} ${isPickedUp ? 'is-picked-up' : ''}`"
+    >
+      {{ square!.piece?.icon }}
+    </span>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { PropType} from "vue";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import type { Square } from "/@/models/GameboardModel";
-import Piece from "./Piece.vue";
 import { useGameState } from "/@/state/Game.state";
 const game$ = useGameState();
 const props = defineProps({
@@ -27,8 +28,13 @@ const square = ref(props.square);
 
 const handleClick = () => {
   console.log(`[Square.handleClick] Origin: ${square.value?.coordinate.file}${square.value?.coordinate.row}`);
-  game$.HandleSelectSquare(square.value!);
+    game$.HandleSelectSquare(square.value!);
 };
+
+const isPickedUp = computed((): boolean => {
+  return game$.OriginSquare?.coordinate == square.value!.coordinate;
+});
+
 </script>
 <style scoped lang="scss">
 
@@ -55,7 +61,7 @@ const handleClick = () => {
   -webkit-text-stroke-color: grey;
   text-shadow: -2px -4px 2px white;
 }
-.piece-is-selected {
+.is-picked-up {
   -webkit-text-stroke-width: 1px;
   -webkit-text-stroke-color: gold;
 }
