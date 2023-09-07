@@ -1,6 +1,7 @@
 import { createWebHistory, createRouter } from "vue-router";
 import HomeView from "../views/HomeView.vue";
 
+
 export const routes = [
   // {
   //   path: "/",
@@ -25,6 +26,11 @@ export const routes = [
   //   name: "QuarkBookView",
   //   component: () => import("../views/QuarkBookView.vue")
   // },
+  {
+    path: "/gameboard",
+    name: "Gameboard",
+    component: () => import("../views/GameboardView.vue")
+  },
   {
     path: "/:pathMatch(.*)*",
     name: "404",

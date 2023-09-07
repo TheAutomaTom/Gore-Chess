@@ -1,14 +1,44 @@
+<template>
+  <div
+    class="app-wrapper"
+    :class="orientation"
+  >
+    <div class="header-wrapper">
+      <div>W:{{ windowWidth }} >= H:{{ windowHeight }} ? {{ orientation }}</div>
+    </div>
+
+    <div class="router-wrapper">
+      <router-view />
+    </div>
+
+    <div class="footer-wrapper">
+      <p>Footer Placeholder</p>
+    </div>
+  </div>
+</template>
+
 <script lang="ts" setup>
-import { onMounted } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useAppState } from "./state/App.state";
 // import router from "./infra/router";
 import { /* IPC Methods */ } from "#preload";
 const app$ = useAppState();
 function handleScroll() { app$.IsScrolled = window.scrollY > 0; }
 
+
+const handleResize = (): void => {
+  windowWidth.value = window.outerWidth;
+  windowHeight.value = window.outerHeight;
+};
+
+const windowWidth = ref( window.innerWidth );
+const windowHeight = ref( window.innerHeight );
+const orientation = computed(() => windowWidth.value >= windowHeight.value ? "landscape-orientation" : "portrait-orientation");
+
 onMounted( async () => {
   // Internal Scroll Listener...
   window.addEventListener("scroll", handleScroll);
+  window.addEventListener("resize", handleResize);
 
   /* IPC EXAMPLES...
   /// Inbound App Menu commands...
@@ -32,11 +62,38 @@ onMounted( async () => {
   // });
   */
 
-});
+}); //... OnMounted
+
+
+
+
 </script>
 
-<template>
-  <div>
-    <router-view></router-view>
-  </div>
-</template>
+<style scoped lang="scss">
+.app-wrapper {
+  position: fixed; left:0; top:0; right:0; bottom:0;
+  background-color: burlywood;
+}
+.header-wrapper {
+  top:0;
+  height: 10vh;
+  width: 100%;
+
+}
+
+// .landscape-orientation {
+// }
+// .portrait-orientation {
+// }
+.router-wrapper {
+  position: relative;
+  height: 400px;
+}
+
+.footer-wrapper {
+  position: fixed;
+  bottom:0;
+  height: 1em;
+}
+
+</style>
