@@ -1,6 +1,3 @@
-<!-- eslint-disable vue/multi-word-component-names -->
-<!-- eslint-disable vue/max-attributes-per-line -->
-<!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <div class="gameboard">
     <template v-for="r in 8" :key="r">

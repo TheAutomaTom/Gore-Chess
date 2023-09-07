@@ -1,6 +1,3 @@
-// Todo: Add this to main linter settings:
-<!-- eslint-disable vue/multiline-html-element-content-newline -->
-
 <template>
   <h1>Home</h1>
   <router-link
@@ -12,7 +9,6 @@
   </router-link>
 
   <span class="test">This is the End!</span>
-
 </template>
 <script setup lang="ts">
 import { routes } from "../infra/router";

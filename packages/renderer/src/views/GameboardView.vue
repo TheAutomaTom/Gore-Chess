@@ -1,13 +1,9 @@
-// Todo: Add this to main linter settings:
-<!-- eslint-disable vue/multiline-html-element-content-newline -->
-
 <template>
   <div
     class="gameboard-div"
   >
     <Gameboard></Gameboard>
   </div>
-
 </template>
 <script setup lang="ts">
 import Gameboard from "../components/GameBoard/Gameboard.vue";
