@@ -1,5 +1,6 @@
 import {app, BrowserWindow} from "electron";
 import {join, resolve} from "node:path";
+import * as signalR from "@microsoft/signalr";
 
 async function createWindow() {
   const browserWindow = new BrowserWindow({
@@ -50,8 +51,37 @@ async function createWindow() {
     await browserWindow.loadFile(resolve(__dirname, "../../renderer/dist/index.html"));
   }
 
+////////////////////////////////////////////////////////
+
+
+  // const connection = new signalr.HubConnectionBuilder()
+  //   .withUrl("/chatHub")
+  //   .build();
+  
+  // connection.on("ReceiveMessage", function (message: string) {
+  //   console.log(message);
+  // });
+  
+  // connection.start().then(function () {
+  //   console.log("Started!");    
+  // }).catch(function (err: any) {
+  //     return console.error(err.toString());
+  // });
+  
+  // connection.invoke("SendMessage", "Word")
+  //   .catch(function (err: any) {
+  //         return console.error(err.toString());
+  //   });
+
+
+////////////////////////////////////////////////////////
+
+initializeSignalRConnection();
+
+//////////////////////////////////////////////////////////
   return browserWindow;
 }
+
 
 /**
  * Restore an existing BrowserWindow or Create a new BrowserWindow.
@@ -61,11 +91,72 @@ export async function restoreOrCreateWindow() {
 
   if (window === undefined) {
     window = await createWindow();
+    initializeSignalRConnection();
   }
 
-  if (window.isMinimized()) {
-    window.restore();
-  }
-
+  if (window.isMinimized()) window.restore();
+  
   window.focus();
 }
+
+
+
+const initializeSignalRConnection = () => {
+  console.log("[initializeSignalRConnection] ...");
+  const connection = new signalR.HubConnectionBuilder()
+    // .configureLogging(signalR.LogLevel.Information)
+    .withUrl("http://localhost:7205/api/")
+    // .withUrl("/api")
+    .build();
+    
+  // signalRConnection.start().then(function () {
+  //   console.log("[signalRConnection.start] ...");    
+  // }).catch(function (err: any) {
+  //     return console.log("[signalRConnection.start] Error: " + err.toString());   
+  // });
+
+  // signalRConnection.on("SendOffersToUser", (result: any) => {
+  //   console.log("[signalRConnection/ SendOffersToUser] Result: " + result.toString());
+  // });
+
+
+
+
+
+  connection.start().catch(function (err) {
+    return console.error(err.toString());
+  });
+
+  
+  connection.invoke("SendMessage", "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+    .catch(function (err) {
+      return console.error(err.toString());
+    }
+  );
+  
+
+  connection.on("newMessage", function (name) {
+      const li = document.createElement("li");
+      li.textContent = name;
+
+      console.log(li);
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+};

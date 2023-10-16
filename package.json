@@ -1,5 +1,5 @@
 {
-  "name": "gore-chess",
+  "name": "GoreChess",
   "description": "Cross-platform chess app",
   "version": "0.0.1",
   "author": {
@@ -55,7 +55,8 @@
     "vue-tsc": "1.8.8"
   },
   "dependencies": {
-    "electron-updater": "6.1.1",
-    "electron-devtools-installer": "^3.1.0"
+    "@microsoft/signalr": "^7.0.10",
+    "electron-devtools-installer": "^3.1.0",
+    "electron-updater": "6.1.1"
   }
 }
